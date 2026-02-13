@@ -1,0 +1,10 @@
+node_modules
+dist
+
+# Environment files
+.env*
+
+# Private keys and certificates
+*.key
+*.pem
+.DS_Store
