@@ -1,0 +1,11 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Publish to npm",
+      "type": "shell",
+      "command": "npm version patch && git push && git push --tags",
+      "problemMatcher": []
+    }
+  ]
+}
