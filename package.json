@@ -1,8 +1,19 @@
 {
-	"name": "Git-thing",
-	"version": "0.0.0",
+	"name": "git-thing",
+	"version": "1.0.1",
+	"description": "A TUI for managing git branches and rebasing",
 	"license": "MIT",
-	"bin": "dist/cli.js",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/nilsbuilds/git-thingy.git"
+	},
+	"homepage": "https://github.com/nilsbuilds/git-thingy#readme",
+	"bugs": {
+		"url": "https://github.com/nilsbuilds/git-thingy/issues"
+	},
+	"bin": {
+		"git-thing": "dist/cli.js"
+	},
 	"type": "module",
 	"engines": {
 		"node": ">=16"
