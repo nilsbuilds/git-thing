@@ -1,0 +1,10 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Tag and publish",
+			"type": "shell",
+			"command": "VERSION=$(node -p \"require('./package.json').version\") && git tag \"v$VERSION\" origin/main && git push origin \"v$VERSION\""
+		}
+	]
+}
