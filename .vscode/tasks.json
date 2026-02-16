@@ -4,7 +4,7 @@
 		{
 			"label": "Tag and publish",
 			"type": "shell",
-			"command": "VERSION=$(node -p \"require('./package.json').version\") && git tag \"v$VERSION\" origin/main && git push origin \"v$VERSION\""
+			"command": "npm version patch && git push origin main --follow-tags"
 		}
 	]
 }
