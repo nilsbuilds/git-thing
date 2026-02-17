@@ -2,13 +2,13 @@ name: publish-to-npm
 
 on:
   push:
-    tags: ['v*']
+    tags: ['build']
 
 jobs:
   publish:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       id-token: write
     steps:
       - uses: actions/checkout@v4
@@ -19,8 +19,43 @@ jobs:
 
       - run: npm install -g npm@latest
 
+      - name: Determine next version
+        id: version
+        run: |
+          RESPONSE=$(curl -s https://registry.npmjs.org/-/package/git-thing/dist-tags)
+          LATEST=$(echo "$RESPONSE" | node -e "
+            let d='';
+            process.stdin.on('data',c=>d+=c);
+            process.stdin.on('end',()=>{
+              try {
+                const v = JSON.parse(d).latest;
+                if (!v) throw new Error();
+                console.log(v);
+              } catch {
+                console.log('0.0.0');
+              }
+            });
+          ")
+          echo "Current latest: $LATEST"
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$LATEST"
+          NEW_VERSION="$MAJOR.$MINOR.$((PATCH + 1))"
+          echo "New version: $NEW_VERSION"
+          echo "version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Set version in package.json
+        run: npm version ${{ steps.version.outputs.version }} --no-git-tag-version
+
       - run: npm ci
 
       - run: npm run build
 
       - run: npm publish --provenance --access public
+
+      - name: Delete build tag and create version tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -d build
+          git push origin :refs/tags/build
+          git tag "v${{ steps.version.outputs.version }}"
+          git push origin "v${{ steps.version.outputs.version }}"

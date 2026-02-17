@@ -2,9 +2,9 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"label": "Tag and publish",
+			"label": "Publish to npm",
 			"type": "shell",
-			"command": "npm version patch && git push origin main --follow-tags"
+			"command": "git tag -f build && git push origin build --force"
 		}
 	]
 }
