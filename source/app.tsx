@@ -3,6 +3,7 @@ import {Box, Text, useApp, useInput} from 'ink'
 import {BranchList} from './components/BranchList.js'
 import {Settings} from './components/Settings.js'
 import {useSettings} from './hooks/useSettings.js'
+import {useUpdateCheck} from './hooks/useUpdateCheck.js'
 import {theme} from './constants/theme.js'
 
 type Tab = 'branches' | 'settings'
@@ -15,8 +16,10 @@ type StatusMessage = {
 export default function App() {
 	const {exit} = useApp()
 	const {settings, updateSetting} = useSettings()
+	const {updateAvailable, latestVersion, currentVersion} = useUpdateCheck()
 	const [activeTab, setActiveTab] = useState<Tab>('branches')
 	const [statusMessage, setStatusMessage] = useState<StatusMessage | null>(null)
+	const [isEditing, setIsEditing] = useState(false)
 
 	// Auto-clear status message after 3s
 	useEffect(() => {
@@ -30,7 +33,7 @@ export default function App() {
 	}, [statusMessage])
 
 	useInput((input, key) => {
-		if (input === 'q' || (key.ctrl && input === 'c')) {
+		if ((key.escape && !isEditing) || (key.ctrl && input === 'c')) {
 			exit()
 		}
 
@@ -68,23 +71,27 @@ export default function App() {
 			</Box>
 
 			{/* Tab content */}
-			<Box flexDirection="column" flexGrow={1}>
-				{activeTab === 'branches' ? (
+			<Box flexDirection="column" height={settings.sectionHeight}>
+				<Box flexDirection="column" flexGrow={1} display={activeTab === 'branches' ? 'flex' : 'none'}>
 					<BranchList
 						baseBranch={settings.baseBranch}
 						autoStash={settings.autoStash}
 						isActive={activeTab === 'branches'}
 						onStatusChange={handleStatusChange}
 					/>
-				) : (
+				</Box>
+				<Box flexDirection="column" flexGrow={1} display={activeTab === 'settings' ? 'flex' : 'none'}>
 					<Settings
 						baseBranch={settings.baseBranch}
 						autoStash={settings.autoStash}
+						sectionHeight={settings.sectionHeight}
 						onBaseBranchChange={(value) => updateSetting('baseBranch', value)}
 						onAutoStashChange={(value) => updateSetting('autoStash', value)}
+						onSectionHeightChange={(value) => updateSetting('sectionHeight', value)}
 						isActive={activeTab === 'settings'}
+						onEditingChange={setIsEditing}
 					/>
-				)}
+				</Box>
 			</Box>
 
 			{/* Persistent status bar at bottom */}
@@ -99,8 +106,13 @@ export default function App() {
 					>
 						{statusMessage.text}
 					</Text>
+				) : updateAvailable ? (
+					<Text color={theme.status.updateColor}>
+						Update available: v{latestVersion} (current: v{currentVersion}) — run
+						npm i -g git-thing
+					</Text>
 				) : (
-					<Text dimColor>Press q to exit</Text>
+					<Text dimColor>Press Esc to exit</Text>
 				)}
 			</Box>
 		</Box>

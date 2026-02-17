@@ -1,40 +1,63 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import {Box, Text, useInput} from 'ink'
 import {theme} from '../constants/theme.js'
+import {currentVersion} from '../hooks/useUpdateCheck.js'
+import {NavigationInfo} from './NavigationInfo.js'
 
 type SettingsProps = {
 	baseBranch: string
 	autoStash: boolean
+	sectionHeight: number
 	onBaseBranchChange: (value: string) => void
 	onAutoStashChange: (value: boolean) => void
+	onSectionHeightChange: (value: number) => void
 	isActive: boolean
+	onEditingChange: (editing: boolean) => void
 }
 
-type SettingItem = 'baseBranch' | 'autoStash'
+type SettingItem = 'baseBranch' | 'autoStash' | 'sectionHeight'
 
 export function Settings({
 	baseBranch,
 	autoStash,
+	sectionHeight,
 	onBaseBranchChange,
 	onAutoStashChange,
+	onSectionHeightChange,
 	isActive,
+	onEditingChange,
 }: SettingsProps) {
 	const [selectedItem, setSelectedItem] = useState<SettingItem>('baseBranch')
 	const [editValue, setEditValue] = useState(baseBranch)
 	const [isEditing, setIsEditing] = useState(false)
 
-	const settingItems: SettingItem[] = ['baseBranch', 'autoStash']
+	const settingItems: SettingItem[] = ['baseBranch', 'autoStash', 'sectionHeight']
+
+	useEffect(() => {
+		onEditingChange(isEditing)
+	}, [isEditing])
 
 	useInput(
 		(input, key) => {
 			if (isEditing) {
 				if (key.return) {
-					if (editValue.trim()) {
-						onBaseBranchChange(editValue.trim())
+					if (selectedItem === 'baseBranch') {
+						if (editValue.trim()) {
+							onBaseBranchChange(editValue.trim())
+						}
+					} else if (selectedItem === 'sectionHeight') {
+						const parsed = Number.parseInt(editValue.trim(), 10)
+						if (!Number.isNaN(parsed) && parsed >= 10) {
+							onSectionHeightChange(parsed)
+						}
 					}
 					setIsEditing(false)
 				} else if (key.escape) {
-					setEditValue(baseBranch)
+					setEditValue(
+						selectedItem === 'sectionHeight'
+							? String(sectionHeight)
+							: baseBranch
+					)
 					setIsEditing(false)
 				} else if (key.backspace || key.delete) {
 					setEditValue((v) => v.slice(0, -1))
@@ -58,62 +81,92 @@ export function Settings({
 					setEditValue(baseBranch)
 				} else if (selectedItem === 'autoStash') {
 					onAutoStashChange(!autoStash)
+				} else if (selectedItem === 'sectionHeight') {
+					setIsEditing(true)
+					setEditValue(String(sectionHeight))
 				}
 			}
 		},
 		{isActive}
 	)
 
-	const modeConfig = theme.modes.settings
+	const modeConfig = theme.modes.selection
 
 	return (
-		<Box flexDirection="column">
-			<Box
-				alignSelf="flex-start"
-				borderStyle={theme.heading.borderStyle}
-				borderColor={modeConfig.color}
-				paddingX={theme.heading.paddingX}
-				paddingY={theme.heading.paddingY}
-				marginBottom={1}
-			>
-				<Text bold color={modeConfig.color}>
-					SETTINGS
-				</Text>
-			</Box>
-
-			{/* Base Branch setting */}
-			<Box>
-				<Text color={selectedItem === 'baseBranch' ? modeConfig.color : undefined}>
-					{selectedItem === 'baseBranch' ? '▸ ' : '  '}
-				</Text>
-				<Text>Base Branch: </Text>
-				{isEditing ? (
-					<Text color="yellow">{editValue}█</Text>
-				) : (
-					<Text bold={selectedItem === 'baseBranch'} color={modeConfig.color}>
-						{baseBranch}
+		<Box flexDirection="column" flexGrow={1}>
+			<Box flexDirection="column" paddingLeft={2}>
+				{/* Base Branch setting */}
+				<Text>
+					<Text
+						color={selectedItem === 'baseBranch' ? modeConfig.color : undefined}
+						bold={selectedItem === 'baseBranch'}
+					>
+						Base Branch:{' '}
 					</Text>
-				)}
-			</Box>
+					{isEditing && selectedItem === 'baseBranch' ? (
+						<Text color="yellow">{editValue}█</Text>
+					) : (
+						<Text
+							bold={selectedItem === 'baseBranch'}
+							color={selectedItem === 'baseBranch' ? modeConfig.color : undefined}
+						>
+							{baseBranch}
+						</Text>
+					)}
+				</Text>
 
-			{/* Auto Stash setting */}
-			<Box>
-				<Text color={selectedItem === 'autoStash' ? modeConfig.color : undefined}>
-					{selectedItem === 'autoStash' ? '▸ ' : '  '}
-				</Text>
-				<Text>Auto Stash: </Text>
-				<Text bold={selectedItem === 'autoStash'} color={autoStash ? 'green' : 'red'}>
-					{autoStash ? 'ON' : 'OFF'}
-				</Text>
-			</Box>
+				{/* Auto Stash setting */}
+				<Box>
+					<Text
+						color={selectedItem === 'autoStash' ? modeConfig.color : undefined}
+						bold={selectedItem === 'autoStash'}
+					>
+						Auto Stash:{' '}
+					</Text>
+					<Text bold={selectedItem === 'autoStash'} color={autoStash ? 'green' : 'red'}>
+						{autoStash ? 'ON' : 'OFF'}
+					</Text>
+				</Box>
 
-			<Box marginTop={1}>
-				<Text dimColor={theme.help.dimmed}>
-					{isEditing
-						? 'Enter save  Esc cancel'
-						: '↑↓ navigate  Enter/Space toggle  Tab switch tab  q quit'}
+				{/* Section Height setting */}
+				<Text>
+					<Text
+						color={selectedItem === 'sectionHeight' ? modeConfig.color : undefined}
+						bold={selectedItem === 'sectionHeight'}
+					>
+						Section Height:{' '}
+					</Text>
+					{isEditing && selectedItem === 'sectionHeight' ? (
+						<Text color="yellow">{editValue}█</Text>
+					) : (
+						<Text
+							bold={selectedItem === 'sectionHeight'}
+							color={selectedItem === 'sectionHeight' ? modeConfig.color : undefined}
+						>
+							{sectionHeight}
+						</Text>
+					)}
 				</Text>
+
+				{/* Version */}
+				<Box marginTop={1}>
+					<Text color="rgb(255,165,0)">Version: {currentVersion}</Text>
+				</Box>
 			</Box>
+			<Box flexGrow={1} />
+			<NavigationInfo
+				isActive={isActive && !isEditing}
+				shortcuts={
+					isEditing
+						? ['Enter Save', 'Esc Cancel']
+						: [
+								'↑↓ Navigate',
+								'Enter/Space Toggle',
+								'Tab Switch tab',
+								'Esc Quit',
+							]
+				}
+			/>
 		</Box>
 	)
 }

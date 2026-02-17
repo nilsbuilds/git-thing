@@ -8,11 +8,13 @@ const SETTINGS_PATH = join(homedir(), '.git-thing-settings.json')
 type Settings = {
 	baseBranch: string
 	autoStash: boolean
+	sectionHeight: number
 }
 
 const DEFAULT_SETTINGS: Settings = {
 	baseBranch: 'main',
 	autoStash: true,
+	sectionHeight: 10,
 }
 
 export function useSettings() {

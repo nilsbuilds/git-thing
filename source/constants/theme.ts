@@ -2,29 +2,11 @@
 // Or hex: #ff0000, rgb: rgb(255,0,0)
 
 export const theme = {
-	// Heading
-	heading: {
-		text: 'BRANCHES',
-		color: 'blue',
-		bold: true,
-		// Border: 'single', 'double', 'round', 'bold', 'classic', 'singleDouble', 'doubleSingle'
-		borderStyle: 'double' as const,
-		borderColor: 'blue',
-		paddingX: 2, // horizontal padding inside box
-		paddingY: 0, // vertical padding inside box
-		marginBottom: 0, // space below heading
-	},
-
 	// Branch list
 	branch: {
 		currentColor: 'green',
 		selectedColor: 'blue',
 		selectedBold: true,
-	},
-
-	// Help text
-	help: {
-		dimmed: true,
 	},
 
 	// Errors
@@ -52,6 +34,7 @@ export const theme = {
 	status: {
 		successColor: 'green',
 		errorColor: 'red',
+		updateColor: 'yellow',
 	},
 
 	// Tabs
