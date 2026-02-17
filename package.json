@@ -13,7 +13,7 @@
 	},
 	"scripts": {
 		"build": "tsc",
-		"dev": "tsc --watch",
+		"dev": "tsc && node dist/cli.js",
 		"dev:watch": "tsx watch source/cli.tsx",
 		"test": "prettier --check . && xo && ava"
 	},
@@ -22,7 +22,6 @@
 	],
 	"dependencies": {
 		"ink": "^4.1.0",
-		"meow": "^11.0.0",
 		"react": "^18.2.0"
 	},
 	"devDependencies": {
