@@ -17,13 +17,13 @@ Stop typing long Git commands and let `git-thing` manage your branching, switchi
 
 To use `git-thing` as a permanent command on your machine without using `npx` every time, install it globally:
 
-    npm install -g git-thing
+    npm install -g git-thing@latest
 
 ## How to Update
 
 When a new version is published to NPM, sync your local copy by running:
 
-    npm update -g git-thing
+    npm update -g git-thing@latest
 
 ## How to Uninstall
 
