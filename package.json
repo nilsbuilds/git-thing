@@ -13,9 +13,7 @@
 	},
 	"scripts": {
 		"build": "tsc",
-		"dev": "tsc && node dist/cli.js",
-		"dev:watch": "tsx watch source/cli.tsx",
-		"test": "prettier --check . && xo && ava"
+		"dev": "tsc && node dist/cli.js"
 	},
 	"files": [
 		"dist"
